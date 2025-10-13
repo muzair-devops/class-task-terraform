@@ -1,0 +1,47 @@
+name: Deploy Terraform on Self-Hosted Runner
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  terraform-deploy:
+    name: Terraform Apply
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Set up Terraform
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.9.5  # or any stable version you use
+
+      # Configure AWS credentials
+      - name: Configure AWS credentials
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+        run: |
+          echo "AWS credentials configured for Terraform."
+
+      # Initialize Terraform
+      - name: Terraform Init
+        run: terraform init
+
+      # Validate and plan
+      - name: Terraform Plan
+        run: terraform plan -out=tfplan
+
+      # Apply infrastructure
+      - name: Terraform Apply
+        run: terraform apply -auto-approve tfplan
+
+      # Show outputs
+      - name: Terraform Output
+        run: terraform output
