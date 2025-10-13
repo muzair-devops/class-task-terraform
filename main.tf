@@ -87,18 +87,6 @@ resource "aws_lambda_function" "be_lambda" {
   source_code_hash = filebase64sha256("lambda_function.zip")
 }
 
-# -------------------------------
-# Lambda Function URL
-# -------------------------------
-resource "aws_lambda_function_url" "be_lambda_url" {
-  function_name      = aws_lambda_function.be_lambda.function_name
-  authorization_type = "NONE"  # public access
-  cors {
-    allow_origins = ["*"]
-    allow_methods = ["GET", "POST", "OPTIONS"]
-    allow_headers = ["*"]
-  }
-}
 
 # -------------------------------
 # Outputs
@@ -109,8 +97,4 @@ output "lambda_function_name" {
 
 output "dynamodb_table_name" {
   value = aws_dynamodb_table.be_dynamodb.name
-}
-
-output "lambda_function_name" {
-  value = aws_lambda_function.be_lambda.function_name
 }
